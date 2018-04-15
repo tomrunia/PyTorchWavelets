@@ -30,7 +30,7 @@ from torch_wavelets.wavelets import Morlet
 
 class TemporalFilterBankBase(metaclass=ABCMeta):
 
-    def __init__(self, dt=1.0, dj=0.125, wavelet=Morlet(), unbias=False, signal_length=None):
+    def __init__(self, dt=1.0, dj=0.125, wavelet=Morlet(), unbias=False, signal_length=512):
 
         self._dt = dt
         self._dj = dj
@@ -47,8 +47,8 @@ class TemporalFilterBankBase(metaclass=ABCMeta):
         raise NotImplementedError
 
     def _init_filters(self):
-        filters = []
-        for i, scale in enumerate(self._scales):
+        filters = [None]*len(self.scales)
+        for scale_idx, scale in enumerate(self._scales):
             # number of points needed to capture wavelet
             M = 10 * scale / self.dt
             # times to use, centred at zero
@@ -56,7 +56,7 @@ class TemporalFilterBankBase(metaclass=ABCMeta):
             if len(t) % 2 == 0: t = t[0:-1]  # requires odd filter size
             # sample wavelet and normalise
             norm = (self.dt / scale) ** .5
-            filters[i] = norm * self.wavelet(t, scale)
+            filters[scale_idx] = norm * self.wavelet(t, scale)
         return filters
 
     def compute_optimal_scales(self):
@@ -78,11 +78,11 @@ class TemporalFilterBankBase(metaclass=ABCMeta):
             return self.fourier_period(s) - 2 * dt
         return scipy.optimize.fsolve(func_to_solve, 1)[0]
 
-    def power(self, signal):
+    def power(self, x):
         if self.unbias:
-            return (np.abs(self.compute(signal)).T ** 2 / self._scales).T
+            return (np.abs(self.compute(x)).T ** 2 / self.scales).T
         else:
-            return np.abs(self.compute(signal)) ** 2
+            return np.abs(self.compute(x)) ** 2
 
     @property
     def fourier_period(self):
@@ -136,13 +136,15 @@ class TemporalFilterBankSciPy(TemporalFilterBankBase):
         num_examples = x.shape[0]
         output = np.zeros((num_examples, len(self.scales), x.shape[-1]), dtype=np.complex)
         for example_idx in range(num_examples):
-            output[example_idx] = self.compute_single(x[example_idx])
-        return np.squeeze(output, 0)
+            output[example_idx] = self._compute_single(x[example_idx])
+        if num_examples == 1:
+            output = output.squeeze(0)
+        return output
 
-    def compute_single(self, x):
+    def _compute_single(self, x):
         assert x.ndim == 1, 'input signal must have single dimension.'
         output = np.zeros((len(self.scales), len(x)), dtype=np.complex)
-        for scale_idx, filt in enumerate(self._filters)
+        for scale_idx, filt in enumerate(self._filters):
             output[scale_idx,:] = scipy.signal.fftconvolve(x, filt, mode='same')
         return output
 
@@ -199,13 +201,36 @@ class TemporalFilterBankTorch(TemporalFilterBankBase, nn.Module):
 
 if __name__ == "__main__":
 
-    dt = 1.0
-    dj = 0.125
-    wavelet = Morlet(w0=6)
-    unbias = False
+    import torch_wavelets.utils as utils
+    import matplotlib.pyplot as plt
 
-    cls_scipy = TemporalFilterBankSciPy(dt, dj, wavelet, unbias)
-    cls_torch = TemporalFilterBankTorch(dt, dj, wavelet, unbias)
+    fps = 20
+    dt  = 1.0/fps
+    dj  = 0.125
+    w0  = 6
+    unbias = False
+    wavelet = Morlet()
+
+    t_min = 0
+    t_max = 10
+    t = np.linspace(t_min, t_max, (t_max-t_min)*fps)
+
+    batch_size = 12
+
+    # Generate a batch of sine waves with random frequency
+    random_frequencies = np.random.uniform(-0.5, 2.0, size=batch_size)
+    batch = np.asarray([np.sin(2*np.pi*f*t) for f in random_frequencies])
+
+    wa = TemporalFilterBankSciPy(dt, dj, wavelet, unbias)
+    power = wa.power(batch)
+
+    fig, ax = plt.subplots(3, 4, figsize=(16,8))
+    ax = ax.flatten()
+    for i in range(batch_size):
+        utils.plot_scalogram(power[i], wa.scales, t, ax=ax[i])
+        ax[i].axhline(1.0 / random_frequencies[i], lw=1, color='k')
+    plt.show()
+
 
 
 

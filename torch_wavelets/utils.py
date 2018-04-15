@@ -17,28 +17,51 @@ from __future__ import division
 from __future__ import print_function
 
 import numpy as np
-from torch_wavelets.wavelets import *
+import matplotlib.pyplot as plt
+
+# This makes the color map of same height as the image
+import matplotlib.ticker as ticker
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+
+
+def plot_scalogram(power, scales, t, normalize_columns=True, cmap=None, ax=None, scale_legend=True):
+
+    if not cmap:
+        cmap = plt.get_cmap("PuBu_r")
+
+    if ax is None:
+        fig, ax = plt.subplots()
+
+    if normalize_columns:
+        power = power/np.max(power, axis=0)
+
+    T, S = np.meshgrid(t, scales)
+    cnt = ax.contourf(T, S, power, 100, cmap=cmap)
+
+    # Fix for saving as PDF (aliasing)
+    for c in cnt.collections:
+        c.set_edgecolor("face")
+
+    ax.set_yscale('log')
+    ax.set_ylabel("Scale (Log Scale)")
+    ax.set_xlabel("Time (s)")
+    ax.set_title("Wavelet Power Spectrum")
+
+    if scale_legend:
+
+        def format_axes_label(x, pos):
+            return "{:.2f}".format(x)
+
+        divider = make_axes_locatable(ax)
+        cax = divider.append_axes("right", size="5%", pad=0.05)
+        plt.colorbar(
+            cnt, cax=cax, ticks=[np.min(power), 0, np.max(power)],
+            format=ticker.FuncFormatter(format_axes_label))
+
+    return ax
 
 
 
-def scale_distribution(wavelet, min_period, max_period, dj=0.125):
-    """
-    Given a minimum and maximum period compute a distribution of scales. The choice of
-    dj depends on the width in spectral space of the wavelet function.
-    For the Morlet, dj=0.5 is the largest that still adequately samples scale.
-    Smaller dj gives finer scale resolution.
 
-    :param wavelet: wavelet instance from (Morlet, Ricker, MexicanHat, Marr)
-    :param min_period: float, minimum period
-    :param max_period: float, maximum period
-    :param dj: float, scale sample density
-    :return: np.ndarray, containing a list of scales
-    """
 
-    assert isinstance(wavelet, (Morlet, Ricker, Marr, Mexican_hat))
-    scale_min = wavelet.scale_from_period(min_period)
-    scale_max = wavelet.scale_from_period(max_period)
-    num_scales = int(np.ceil((1.0/dj) * np.log2(scale_max/scale_min)))
-    j = np.arange(0, num_scales+1)
-    scales = scale_min*np.power(2, j*dj)
-    return scales
+
