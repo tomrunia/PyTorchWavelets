@@ -19,7 +19,8 @@ from __future__ import print_function
 import time
 import numpy as np
 
-from wavelets_pytorch.transform import WaveletTransform, WaveletTransformTorch
+from wavelets_pytorch.transform import WaveletTransform
+from wavelets_pytorch.transform import WaveletTransformTorch
 
 ######################################
 

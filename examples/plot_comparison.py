@@ -54,9 +54,6 @@ power_torch = wa_torch.power(batch)
 ######################################
 # Plotting
 
-import cortex.plot
-cortex.plot.init_plotting()
-
 fig, ax = plt.subplots(1, 3, figsize=(12,3))
 ax = ax.flatten()
 ax[0].plot(t, batch[0])
@@ -74,8 +71,4 @@ ax[2].set_ylabel('')
 ax[2].set_yticks([])
 
 plt.tight_layout()
-
-plt.savefig('/home/tomrunia/Dropbox/scalogram_comparison.pdf')
-plt.savefig('/home/tomrunia/Dropbox/scalogram_comparison.png', dpi=200)
-
 plt.show()
