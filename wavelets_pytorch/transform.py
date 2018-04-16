@@ -213,7 +213,7 @@ class WaveletTransformTorch(WaveletTransformBase):
             # Signal length different from initial, need to recompute optimal scales
             self.signal_length = signal_length
 
-        # Move to GPU and convole signals
+        # Move to GPU and convolve signals
         x = Variable(torch.from_numpy(x).type(torch.FloatTensor), requires_grad=False)
         if self._cuda: x = x.cuda()
         cwt = self._extractor(x)
