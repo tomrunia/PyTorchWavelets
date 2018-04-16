@@ -46,13 +46,7 @@ Performing parallel CWT computation on the GPU using PyTorch results in a signif
 
 ## Installation
 
-Directly using `pip`:
-
-```
-pip install -e git+git@github.com:tomrunia/PyTorchWavelets.git#egg=wavelets_pytorch --upgrade
-```
-
-Or clone and install:
+Clone and install:
 
 ```sh
 git clone https://github.com/tomrunia/PyTorchWavelets.git
