@@ -1,14 +1,14 @@
 # Continuous Wavelet Transforms in PyTorch
 
 This is a PyTorch implementation for the wavelet analysis outlined in [Torrence
-and Compo (BAMS, 1998)](http://paos.colorado.edu/research/wavelets/). The code build upon the excellent [implementation](https://github.com/aaren/wavelets/)
+and Compo (BAMS, 1998)](http://paos.colorado.edu/research/wavelets/). The code builds upon the excellent [implementation](https://github.com/aaren/wavelets/)
 of Aaron O'Leary by adding a PyTorch filter bank wrapper to enable fast convolution on the GPU. Specifically, the code was written to speed-up the CWT computation for a large number of 1D signals and relies on `torch.nn.Conv1d` for convolution. 
 
 ![PyTorch Wavelets](/assets/scalogram_comparison.png "Scalogram Comparison")
 
-### Usage ###
+## Usage
 
-In addition to the PyTorch implementation defined in `WaveletTransformTorch` the original SciPy version is also included in `WaveletTransform` for completeness. As the GPU implementation highly benefits from parallelization the `cwt` and `power` methods expect signal batches of shape `[num_signals,signal_length]` instead of individual signals. 
+In addition to the PyTorch implementation defined in `WaveletTransformTorch` the original SciPy version is also included in `WaveletTransform` for completeness. As the GPU implementation highly benefits from parallelization, the `cwt` and `power` methods expect signal batches of shape `[num_signals,signal_length]` instead of individual signals. 
 
 ```python
 import numpy as np
@@ -40,11 +40,9 @@ The wavelet implementations are taken from [here](https://github.com/aaren/wavel
 
 ## Benchmark
 
-Performing parallel CWT computation on the GPU using PyTorch results in a significant speed-up. Increasing the batch size will give faster runtimes. The plot below shows a comaprison between the `scipy` versus `torch` implementation as function of the batch size `N` and input signal length. These results were obtained on a powerful Linux machine with NVIDIA Titan X GPU.
+Performing parallel CWT computation on the GPU using PyTorch results in a significant speed-up. Increasing the batch size will give faster runtimes. The plot below shows a comaprison between the `scipy` versus `torch` implementation as function of the batch size `N` and input signal length. These results were obtained on a powerful Linux desktop with NVIDIA Titan X GPU.
 
 <a href="/assets/runtime_versus_signal_length.png"><img src="/assets/runtime_versus_signal_length.png" width="700px" ></a>
-
-
 
 ## Installation
 
