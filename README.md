@@ -8,7 +8,7 @@ of Aaron O'Leary with a PyTorch wrapper to enable fast convolution on the GPU. S
 
 ### Usage ###
 
-```
+```python
 import numpy as np
 from wavelets_pytorch.transform import WaveletTransform        # SciPy version
 from wavelets_pytorch.transform import WaveletTransformTorch   # PyTorch version
