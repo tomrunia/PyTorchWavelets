@@ -10,16 +10,15 @@
 # furnished to do so, subject to conditions.
 #
 # Author: Tom Runia
-# Date Created: 2018-XX-XX
+# Date Created: 2018-04-16
 
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
 import numpy as np
-import matplotlib.pyplot as plt
 
-# This makes the color map of same height as the image
+import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
