@@ -1,46 +1,48 @@
 # Continuous Wavelet Transforms in PyTorch
 
 This is a PyTorch implementation for the wavelet analysis outlined in [Torrence
-and Compo][TC_Home] (BAMS, 1998). The code is based on the excellent [SciPy implementation](https://github.com/aaren/wavelets/)
-of Aaron O'Leary.
+and Compo (BAMS, 1998)](http://paos.colorado.edu/research/wavelets/). The code complements the excellent [implementation](https://github.com/aaren/wavelets/)
+of Aaron O'Leary with a PyTorch wrapper to enable fast convolution on the GPU. Specifically, the code was written to speed-up the CWT computation for a large number of 1D signals and relies on `torch.nn.Conv1d` for convolution. 
+
+![PyTorch Wavelets](/assets/scalogram_comparison.png "Scalogram Comparison")
 
 ### Usage ###
 
 ```
-todo
+import numpy as np
+from wavelets_pytorch.transform import WaveletTransform        # SciPy version
+from wavelets_pytorch.transform import WaveletTransformTorch   # PyTorch version
+
+dt = 0.1         # sampling frequency
+dj = 0.125       # scale distribution parameter
+batch_size = 32  # how many signals to process in parallel
+
+# Batch of signals to process
+batch = [batch_size x signal_length] 
+
+# Initialize wavelet filter banks (scipy and torch implementation)
+wa_scipy = WaveletTransform(dt, dj)
+wa_torch = WaveletTransformTorch(dt, dj, cuda=True)
+
+# Performing wavelet transform (and compute scalogram)
+cwt_scipy = wa_scipy.cwt(batch)
+cwt_torch = wa_torch.cwt(batch)
+
+# For plotting, see the examples/plot.py function.
+# ...
 ```
 
-#### How would you plot this? ####
+## Supported Wavelets
 
-```python
-import matplotlib.pyplot as plt
+The wavelet implementations are taken from [here](https://github.com/aaren/wavelets/blob/master/wavelets/wavelets.py). Default is the Morlet wavelet.
 
-fig, ax = plt.subplots()
-T, S = np.meshgrid(t, scales)
-ax.contourf(T, S, power, 100)
-ax.set_yscale('log')
-fig.savefig('test_wavelet_power_spectrum.png')
-```
+## Benchmark
 
-See the [tests](./tests.py) for more plotting examples.
+Performing parallel CWT computation on the GPU using PyTorch results in a significant speed-up. Increasing the batch size will give faster runtimes. The plot below shows a comaprison between the `scipy` versus `torch` implementation as function of the batch size `N` and input signal length. These results were obtained on a powerful Linux machine with NVIDIA Titan X GPU.
 
-#### What wavelet functions can I use? ####
+![PyTorchWavelets Benchmark](/assets/runtime_versus_signal_length.png "Runtimes Benchmark")
 
-The default is to use the Morlet. The Ricker (aka Mexican hat, aka
-Marr) is also available.
-
-You can write your own wavelet functions, in either time or
-frequency. Just follow the example of Morlet in the source.
-
-You specify the function to use when starting the analysis:
-
-```python
-from wavelets import Ricker
-
-wa = WaveletAnalysis(data=x, wavelet=Ricker(), dt=dt)
-```
-
-### Installation ###
+## Installation
 
 ```sh
 pip install git+https://github.com/tomrunia/wavelets_pytorch
@@ -57,15 +59,14 @@ pip install -r test-requirements.txt
 nosetests
 ```
 
-### Requirements ###
+## Requirements
 
 - Python 3.6 (other versions might work but have not been tested)
 - Numpy (developed with 1.14.1)
 - Scipy (developed with 1.0.0)
 - PyTorch (developed with 0.3.1)
 
-Scipy is only used for `signal.fftconvolve` and `optimize.fsolve`,
-and could potentially be removed.
+The core of the PyTorch implementation relies on the `torch.nn.Conv1d` module.
 
 ## License
 
