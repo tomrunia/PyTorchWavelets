@@ -25,6 +25,15 @@ import torch.nn as nn
 class TorchFilterBank(nn.Module):
 
     def __init__(self, filters=None, cuda=True):
+        """
+        Temporal filter bank in PyTorch storing a collection of nn.Conv1d filters.
+        When cuda=True, the convolutions are performed on the GPU. If initialized with
+        filters=None, the set_filters() method has to be called before actual running
+        the convolutions.
+
+        :param filters: list, collection of variable sized 1D filters (default: [])
+        :param cuda: boolean, whether to run on GPU or not (default: True)
+        """
         super(TorchFilterBank, self).__init__()
         self._cuda = cuda
         self._filters = [] if not filters else self.set_filters(filters)
@@ -53,8 +62,8 @@ class TorchFilterBank(nn.Module):
 
     def set_filters(self, filters, padding_type='SAME'):
         """
-        Given a list of filters, this method creates a list of nn.conv1d objects
-        that jointly form the filter bank.
+        Given a list of temporal 1D filters of variable size, this method creates a
+        list of nn.conv1d objects that collectively form the filter bank.
 
         :param filters: list, collection of filters each a np.ndarray
         :param padding_type: str, should be SAME or VALID
@@ -74,10 +83,10 @@ class TorchFilterBank(nn.Module):
                 filt_weights = np.asarray([np.real(filt), np.imag(filt)], np.float32)
             else:
                 chn_out = 1
-                filt_weights = filt.astype(np.float32)
+                filt_weights = filt.astype(np.float32)[None,:]
 
-            filt_weights = np.expand_dims(filt_weights, 1)
-            filt_size = filt_weights.shape[-1]
+            filt_weights = np.expand_dims(filt_weights, 1)  # append chn_in dimension
+            filt_size = filt_weights.shape[-1]              # filter length
             padding = self._get_padding(padding_type, filt_size)
 
             conv = nn.Conv1d(1, chn_out, kernel_size=filt_size, padding=padding, bias=False)

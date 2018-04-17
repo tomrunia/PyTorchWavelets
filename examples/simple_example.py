@@ -20,23 +20,33 @@ import numpy as np
 from wavelets_pytorch.transform import WaveletTransform        # SciPy version
 from wavelets_pytorch.transform import WaveletTransformTorch   # PyTorch version
 
-dt = 0.1         # sampling frequency
-dj = 0.125       # scale distribution parameter
-batch_size = 32  # how many signals to process in parallel
+from wavelets_pytorch.wavelets import Morlet, Ricker
+
+"""
+Example script to demonstrate the CWT on a batch of random sinusoidal signals. 
+We compare both the SciPy implementation and the PyTorch implementation. 
+"""
+
+dt = 0.1               # sampling frequency
+dj = 0.125             # scale distribution parameter
+batch_size = 32        # how many signals to process in parallel
 
 t = np.linspace(0., 10., int(10./dt))
 
-# Sinusoidals with random frequency
-frequencies = np.random.uniform(-0.5, 2.0, size=batch_size)
-batch = np.asarray([np.sin(2*np.pi*f*t) for f in frequencies])
+# Both use a complex and real wavelet
+for wavelet in [Morlet(), Ricker()]:
 
-# Initialize wavelet filter banks (scipy and torch implementation)
-wa_scipy = WaveletTransform(dt, dj)
-wa_torch = WaveletTransformTorch(dt, dj, cuda=True)
+    # Sinusoidals with random frequency
+    frequencies = np.random.uniform(-0.5, 2.0, size=batch_size)
+    batch = np.asarray([np.sin(2*np.pi*f*t) for f in frequencies])
 
-# Performing wavelet transform (and compute scalogram)
-cwt_scipy = wa_scipy.cwt(batch)
-cwt_torch = wa_torch.cwt(batch)
+    # Initialize wavelet filter banks (scipy and torch implementation)
+    wa_scipy = WaveletTransform(dt, dj, wavelet)
+    wa_torch = WaveletTransformTorch(dt, dj, wavelet, cuda=True)
 
-# For plotting, see the examples/plot.py function.
-# ...
+    # Performing wavelet transform (and compute scalogram)
+    cwt_scipy = wa_scipy.cwt(batch)
+    cwt_torch = wa_torch.cwt(batch)
+
+    # For plotting, see the examples/plot.py function.
+    # ...
