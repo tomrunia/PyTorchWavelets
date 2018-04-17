@@ -57,7 +57,7 @@ python setup.py install
 
 ## Requirements
 
-- Python 3.4+ (`ABCMeta` in `transform.py` requires Python 3.4 or later)
+- Python 2.7 or 3.6 (other versions might also work)
 - Numpy (developed with 1.14.1)
 - Scipy (developed with 1.0.0)
 - PyTorch (developed with 0.3.1)

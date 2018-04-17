@@ -34,7 +34,7 @@ def plot_scalogram(power, scales, t, normalize_columns=True, cmap=None, ax=None,
     :param cmap: matplotlib cmap, please refer to their documentation
     :param ax: matplotlib axis object, if None creates a new subplot
     :param scale_legend: boolean, whether to include scale legend on the right
-    :return:
+    :return: ax, matplotlib axis object that contains the scalogram
     """
 
     if not cmap: cmap = plt.get_cmap("PuBu_r")
@@ -62,9 +62,3 @@ def plot_scalogram(power, scales, t, normalize_columns=True, cmap=None, ax=None,
                      format=ticker.FuncFormatter(format_axes_label))
 
     return ax
-
-
-
-
-
-

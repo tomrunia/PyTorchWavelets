@@ -16,6 +16,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import six
 from abc import ABCMeta, abstractmethod
 
 import numpy as np
@@ -30,7 +31,8 @@ from wavelets_pytorch.network import TorchFilterBank
 
 ##########################################################################################
 
-class WaveletTransformBase(metaclass=ABCMeta):
+@six.add_metaclass(ABCMeta)
+class WaveletTransformBase(object):
     """
 
     Base class for the Continuous Wavelet Transform as described in:
@@ -112,7 +114,6 @@ class WaveletTransformBase(metaclass=ABCMeta):
         """
         Performs CWT and converts to a power spectrum (scalogram).
         See Torrence & Combo, Section 4d.
-
         :param x: np.ndarray, batch of input signals of shape [n_batch,signal_length]
         :return: np.ndarray, scalogram for each signal [n_batch,n_scales,signal_length]
         """
@@ -281,10 +282,12 @@ class WaveletTransformTorch(WaveletTransformBase):
         """
 
         if x.ndim == 1:
-            # Append batch_size and chn_in dimensions [signal_length] => [n_batch,1,signal_length]
+            # Append batch_size and chn_in dimensions
+            # [signal_length] => [n_batch,1,signal_length]
             x = x[None,None,:]
         elif x.ndim == 2:
-            # Append chn_in dimension [n_batch,signal_length] => [n_batch,1,signal_length]
+            # Just append chn_in dimension
+            # [n_batch,signal_length] => [n_batch,1,signal_length]
             x = x[:,None,:]
 
         num_examples  = x.shape[0]
