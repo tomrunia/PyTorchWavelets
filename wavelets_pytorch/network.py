@@ -91,7 +91,7 @@ class TorchFilterBank(nn.Module):
 
             conv = nn.Conv1d(1, chn_out, kernel_size=filt_size, padding=padding, bias=False)
             conv.weight.data = torch.from_numpy(filt_weights)
-            conv.requires_grad = False
+            conv.weight.requires_grad_(False)
 
             if self._cuda: conv.cuda()
             self._filters[ind] = conv

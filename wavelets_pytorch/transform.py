@@ -299,12 +299,14 @@ class WaveletTransformTorch(WaveletTransformBase):
             self.signal_length = signal_length
 
         # Move to GPU and perform CWT computation
-        x = Variable(torch.from_numpy(x).type(torch.FloatTensor), requires_grad=False)
+        x = torch.from_numpy(x).type(torch.FloatTensor)
+        x.requires_grad_(requires_grad=False)
+
         if self._cuda: x = x.cuda()
         cwt = self._extractor(x)
 
         # Move back to CPU
-        cwt = cwt.data
+        cwt = cwt.detach()
         if self._cuda:  cwt = cwt.cpu()
         cwt = cwt.numpy()
 
