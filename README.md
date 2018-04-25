@@ -60,7 +60,7 @@ python setup.py install
 - Python 2.7 or 3.6 (other versions might also work)
 - Numpy (developed with 1.14.1)
 - Scipy (developed with 1.0.0)
-- PyTorch (developed with 0.3.1)
+- PyTorch >= 0.4.0
 
 The core of the PyTorch implementation relies on the `torch.nn.Conv1d` module.
 
