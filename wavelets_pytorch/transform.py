@@ -299,29 +299,29 @@ class WaveletTransformTorch(WaveletTransformBase):
             self.signal_length = signal_length
 
         # Move to GPU and perform CWT computation
-        x = torch.from_numpy(x).type(torch.FloatTensor)
-        x.requires_grad_(requires_grad=False)
+        #x = torch.from_numpy(x).type(torch.FloatTensor)
+        #x.requires_grad_(requires_grad=False)
 
         if self._cuda: x = x.cuda()
         cwt = self._extractor(x)
 
-        # Move back to CPU
-        cwt = cwt.detach()
-        if self._cuda:  cwt = cwt.cpu()
-        cwt = cwt.numpy()
+        ## Move back to CPU
+        #cwt = cwt.detach()
+        #if self._cuda:  cwt = cwt.cpu()
+        #cwt = cwt.numpy()
 
-        if self.complex_wavelet:
-            # Combine real and imag parts, returns object of shape
-            # [n_batch,n_scales,signal_length] of type np.complex128
-            cwt = (cwt[:,:,0,:] + cwt[:,:,1,:]*1j).astype(self.output_dtype)
-        else:
-            # Just squeeze the chn_out dimension (=1) to obtain an object of shape
-            # [n_batch,n_scales,signal_length] of type np.float64
-            cwt = np.squeeze(cwt, 2).astype(self.output_dtype)
+        #if self.complex_wavelet:
+        #    # Combine real and imag parts, returns object of shape
+        #    # [n_batch,n_scales,signal_length] of type np.complex128
+        #    cwt = (cwt[:,:,0,:] + cwt[:,:,1,:]*1j).astype(self.output_dtype)
+        #else:
+        #    # Just squeeze the chn_out dimension (=1) to obtain an object of shape
+        #    # [n_batch,n_scales,signal_length] of type np.float64
+        #    cwt = np.squeeze(cwt, 2).astype(self.output_dtype)
 
-        # Squeeze batch dimension if single example
-        if num_examples == 1:
-            cwt = cwt.squeeze(0)
+        ## Squeeze batch dimension if single example
+        #if num_examples == 1:
+        #    cwt = cwt.squeeze(0)
         return cwt
 
     @property
