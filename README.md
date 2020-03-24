@@ -6,6 +6,21 @@ of Aaron O'Leary by adding a PyTorch filter bank wrapper to enable fast convolut
 
 ![PyTorch Wavelets](/assets/scalogram_comparison.png "Scalogram Comparison")
 
+## Citation
+
+If you found this code useful, please cite our paper [Repetition Estimation](https://link.springer.com/article/10.1007/s11263-019-01194-0) (IJCV, 2019):
+
+    @article{runia2019repetition,
+      title={Repetition estimation},
+      author={Runia, Tom FH and Snoek, Cees GM and Smeulders, Arnold WM},
+      journal={International Journal of Computer Vision},
+      volume={127},
+      number={9},
+      pages={1361--1383},
+      year={2019},
+      publisher={Springer}
+    }
+    
 ## Usage
 
 In addition to the PyTorch implementation defined in `WaveletTransformTorch` the original SciPy version is also included in `WaveletTransform` for completeness. As the GPU implementation highly benefits from parallelization, the `cwt` and `power` methods expect signal batches of shape `[num_signals,signal_length]` instead of individual signals. 
